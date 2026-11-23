@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPEB CloudQuest | Survei Digital Mahasiswa FPEB UPI</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js untuk efek suara interaktif tanpa file eksternal -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            upi: {
+              maroon: '#8B1E24',
+              dark: '#5E1116',
+              gold: '#F59E0B',
+            },
+            gws: {
+              blue: '#4285F4',
+              red: '#EA4335',
+              yellow: '#FBBC05',
+              green: '#34A853',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(66, 133, 244, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(139, 30, 36, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(52, 168, 83, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(251, 188, 5, 0.08) 0px, transparent 50%);
+      min-height: 100vh;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes xpFloat {
+      0% { opacity: 1; transform: translateY(0) scale(0.9); }
+      60% { opacity: 1; transform: translateY(-28px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-44px) scale(1); }
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+    }
+
+    @keyframes kokoBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-12px) scale(1.06); }
+      70% { transform: translateY(-4px) scale(0.98); }
+    }
+
+    @keyframes kokoWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      75% { transform: rotate(6deg); }
+    }
+
+    .animate-float {
+      animation: floatSlow 3.5s ease-in-out infinite;
+    }
+
+    .animate-koko-bounce {
+      animation: kokoBounce 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .animate-koko-wiggle {
+      animation: kokoWiggle 0.5s ease-in-out;
+    }
+
+    .animate-pop {
+      animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .xp-toast {
+      position: fixed;
+      pointer-events: none;
+      z-index: 60;
+      animation: xpFloat 0.95s ease-out forwards;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      z-index: 50;
+      pointer-events: none;
+      animation: confettiFall linear forwards;
+    }
+
+    /* Custom scrollbar ringan */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+
+  <!-- ==================== TOP HUD NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-white/85 border-b border-slate-200/80 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-upi-maroon via-gws-blue to-gws-green p-0.5 shadow-sm flex-shrink-0">
+          <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+            <!-- Custom SVG Cloud + Academic Cap Icon -->
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
+              <path d="M6.5 19H17.5C19.9853 19 22 16.9853 22 14.5C22 12.1564 20.2085 10.2313 17.9197 10.0193C17.4272 6.61771 14.5048 4 11 4C7.13401 4 4 7.13401 4 11C4 11.278 4.0162 11.5522 4.04775 11.8217C2.30956 12.4638 1 14.1366 1 16.1C1 18.6 3.2 19 6.5 19Z" fill="#4285F4" fill-opacity="0.18" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8.5 13.5L11.5 16.5L16.5 11" stroke="#34A853" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-slate-900">FPEB CloudQuest</span>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-upi-maroon border border-red-200">@upi.edu</span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium leading-tight">Riset Pengelolaan Dokumen Akademik Digital</p>
+        </div>
+      </div>
+
+      <!-- HUD Stats & Controls -->
+      <div class="flex items-center gap-2">
+        <!-- XP Pill -->
+        <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200/80 px-3 py-1.5 rounded-full shadow-inner">
+          <span class="text-sm">⚡</span>
+          <span id="hud-xp" class="text-xs sm:text-sm font-extrabold text-amber-700">0 XP</span>
+        </div>
+
+        <!-- Streak Pill -->
+        <div id="hud-streak-box" class="hidden sm:flex items-center gap-1 bg-orange-50 border border-orange-200/80 px-2.5 py-1.5 rounded-full">
+          <span class="text-xs">🔥</span>
+          <span id="hud-streak" class="text-xs font-bold text-orange-700">x1</span>
+        </div>
+
+        <!-- Sound Toggle -->
+        <button id="btn-sound" type="button" onclick="toggleSound()" title="Suara Efek Interaktif"
+          class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95">
+          <span id="sound-icon" class="text-sm">🔊</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Global Progress Bar -->
+    <div class="w-full h-1.5 bg-slate-100 overflow-hidden">
+      <div id="global-progress-bar" class="h-full bg-gradient-to-r from-gws-blue via-gws-yellow to-gws-green transition-all duration-500 ease-out" style="width: 0%;"></div>
+    </div>
+  </header>
+
+  <!-- ==================== GLOBAL TOAST NOTIFICATION ==================== -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-xs sm:max-w-sm pointer-events-none"></div>
+
+  <!-- ==================== MAIN CONTAINER ==================== -->
+  <main class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 1: WELCOME & CHARACTER ONBOARDING                         -->
+    <!-- ================================================================ -->
+    <section id="screen-welcome" class="animate-pop">
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+        <!-- Hero Banner -->
+        <div class="relative bg-gradient-to-br from-upi-maroon via-[#6e161b] to-slate-900 text-white p-6 sm:p-10 overflow-hidden">
+          <!-- Decorative Google Workspace Dots -->
+          <div class="absolute top-4 right-4 flex gap-1.5 opacity-80">
+            <span class="w-3 h-3 rounded-full bg-gws-blue"></span>
+            <span class="w-3 h-3 rounded-full bg-gws-red"></span>
+            <span class="w-3 h-3 rounded-full bg-gws-yellow"></span>
+            <span class="w-3 h-3 rounded-full bg-gws-green"></span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-semibold text-amber-200 mb-4 border border-white/10">
+            <span>🎓</span>
+            <span>Khusus Mahasiswa Aktif FPEB UPI</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-3">
+            Seberapa Jago Kamu Mengelola Dokumen Kuliah di <span class="text-amber-300">@upi.edu</span>?
+          </h1>
+
+          <p class="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl mb-6">
+            Bantu penelitian akademik FPEB UPI tentang <strong>Pengaruh Pemanfaatan Google Workspace for Education terhadap Pengelolaan Dokumen Akademik Digital</strong>. Bukan kuesioner membosankan—selesaikan 6 misi singkat bersama <strong>Koko</strong>, kumpulkan XP, dan temukan <em>Persona Digital</em> kamu!
+          </p>
+
+          <!-- Mascot Koko Welcome Widget -->
+          <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 mb-6 flex items-center gap-4">
+            <div id="welcome-koko-slot" class="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 animate-float"></div>
+            <div class="space-y-1">
+              <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-200 text-[10px] font-extrabold uppercase tracking-wider">
+                <span>🦉 Pemandu Misi • Koko FPEB</span>
+              </div>
+              <p class="text-xs sm:text-sm text-white font-medium leading-snug">
+                "Halo teman-teman FPEB UPI! Aku <strong>Koko</strong>, pemandu misi digitalmu hari ini. Yuk isi profil singkatmu di bawah dan selesaikan 15 pernyataan seru dalam ±2 menit!"
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Info Badges -->
+          <div class="flex flex-wrap gap-2.5 text-xs font-semibold">
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+              <span>⏱️</span><span>± 2 Menit Saja</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+              <span>🎯</span><span>15 Pernyataan (6 Level)</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+              <span>🏅</span><span>6 Badge + Kartu Skor Digital</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Respondent Profile & Avatar Selection -->
+        <div class="p-6 sm:p-8 space-y-6">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-blue-100 text-gws-blue flex items-center justify-center text-sm font-extrabold">1</span>
+              Pilih Avatar Explorer Kamu
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5 mb-3">Pilih karakter yang paling menggambarkan gaya kuliahmu di FPEB!</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="avatar-grid">
+              <!-- Avatar cards injected by JS -->
+            </div>
+          </div>
+
+          <hr class="border-slate-100" />
+
+          <!-- Identitas Responden -->
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-emerald-100 text-gws-green flex items-center justify-center text-sm font-extrabold">2</span>
+                Profil Singkat Mahasiswa FPEB UPI
+              </h2>
+              <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-full">
+                🦉 Tips Koko: Pastikan kamu pakai akun @upi.edu ya!
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Nama / Inisial -->
+              <div>
+                <label for="input-nama" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  Nama Panggilan / Inisial <span class="text-rose-500">*</span>
+                </label>
+                <input id="input-nama" type="text" placeholder="Contoh: Raka / A.P."
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-gws-blue focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-medium transition" />
+              </div>
+
+              <!-- NIM (Opsional) -->
+              <div>
+                <label for="input-nim" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  NIM <span class="text-slate-400 font-normal">(Opsional, untuk validasi)</span>
+                </label>
+                <input id="input-nim" type="text" inputmode="numeric" placeholder="Contoh: 2201234"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-gws-blue focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-medium transition" />
+              </div>
+
+              <!-- Program Studi FPEB UPI -->
+              <div>
+                <label for="input-prodi" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  Program Studi (FPEB UPI) <span class="text-rose-500">*</span>
+                </label>
+                <select id="input-prodi"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-gws-blue focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-medium transition">
+                  <option value="">-- Pilih Program Studi --</option>
+                  <option value="Pendidikan Akuntansi">Pendidikan Akuntansi</option>
+                  <option value="Pendidikan Bisnis">Pendidikan Bisnis</option>
+                  <option value="Pendidikan Ekonomi">Pendidikan Ekonomi</option>
+                  <option value="Pendidikan Manajemen Perkantoran">Pendidikan Manajemen Perkantoran</option>
+                  <option value="Manajemen">Manajemen</option>
+                  <option value="Akuntansi">Akuntansi</option>
+                  <option value="Ilmu Ekonomi dan Keuangan Islam (IEKI)">Ilmu Ekonomi dan Keuangan Islam (IEKI)</option>
+                </select>
+              </div>
+
+              <!-- Angkatan -->
+              <div>
+                <label for="input-angkatan" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  Angkatan <span class="text-rose-500">*</span>
+                </label>
+                <select id="input-angkatan"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-gws-blue focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-medium transition">
+                  <option value="">-- Pilih Angkatan --</option>
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                  <option value="2021 atau sebelumnya">2021 atau sebelumnya</option>
+                </select>
+              </div>
+
+              <!-- Perangkat Utama -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                  Perangkat Utama Mengakses Google Workspace (@upi.edu) <span class="text-rose-500">*</span>
+                </label>
+                <div class="grid grid-cols-3 gap-2.5" id="device-options">
+                  <button type="button" onclick="selectDevice('Laptop / PC')" data-device="Laptop / PC"
+                    class="device-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-blue-300 text-xs sm:text-sm font-semibold text-slate-700 flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+                    <span>💻</span><span>Laptop / PC</span>
+                  </button>
+                  <button type="button" onclick="selectDevice('Smartphone')" data-device="Smartphone"
+                    class="device-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-blue-300 text-xs sm:text-sm font-semibold text-slate-700 flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+                    <span>📱</span><span>Smartphone</span>
+                  </button>
+                  <button type="button" onclick="selectDevice('Multi-Perangkat')" data-device="Multi-Perangkat"
+                    class="device-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-blue-300 text-xs sm:text-sm font-semibold text-slate-700 flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+                    <span>🔄</span><span>Keduanya</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Start Quest CTA -->
+          <div class="pt-2">
+            <button type="button" onclick="startQuest()"
+              class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-gws-blue via-blue-600 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-extrabold text-base sm:text-lg shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2.5 transition transform active:scale-[0.99]">
+              <span>Mulai Misi Sekarang</span>
+              <span class="text-xl">🚀</span>
+            </button>
+            <p class="text-center text-[11px] text-slate-400 mt-3">
+              🔒 Data digunakan sepenuhnya untuk keperluan penelitian akademik FPEB UPI dan tersimpan aman.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 2: GAMIFIED QUEST STAGES (6 STAGES / 15 ITEMS)            -->
+    <!-- ================================================================ -->
+    <section id="screen-quest" class="hidden space-y-5">
+
+      <!-- 6-Stage Interactive World Map Stepper -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+        <div class="flex items-center justify-between text-xs font-bold text-slate-500 mb-3">
+          <span id="quest-progress-text">Progres Misi: 0 / 15 Pernyataan</span>
+          <span id="quest-percent-text" class="text-gws-blue">0%</span>
+        </div>
+        <div class="grid grid-cols-6 gap-1.5 sm:gap-2" id="stage-stepper">
+          <!-- Stage pills injected by JS -->
+        </div>
+      </div>
+
+      <!-- Koko Live Companion Guide Widget -->
+      <div id="koko-companion-card" class="bg-gradient-to-r from-amber-50/90 via-white to-blue-50/80 rounded-2xl p-3.5 sm:p-4 border border-amber-200/80 shadow-sm flex items-center gap-3.5 transition-all duration-300">
+        <div id="quest-koko-avatar" class="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 animate-float">
+          <!-- Dynamic Koko SVG injected by JS -->
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-0.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-upi-maroon text-white">Koko Pemandu</span>
+            <span id="koko-mood-badge" class="text-[11px] font-bold text-amber-700">Siap Memandu Misi ✨</span>
+          </div>
+          <p id="koko-speech-text" class="text-xs sm:text-sm font-semibold text-slate-700 leading-snug">
+            "Baca setiap pernyataan dengan santai ya, lalu pilih skala yang paling sesuai dengan pengalamanmu di @upi.edu!"
+          </p>
+        </div>
+      </div>
+
+      <!-- Checkpoint Celebration Banner (Appears at Stage 4 when entering Variable Y) -->
+      <div id="checkpoint-banner" class="hidden bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl p-4 sm:p-5 shadow-md animate-pop">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl flex-shrink-0 animate-float">
+            🏆
+          </div>
+          <div>
+            <div class="text-[11px] uppercase tracking-wider font-extrabold text-emerald-100">Checkpoint Tercapai! Variabel X Selesai</div>
+            <h3 class="text-sm sm:text-base font-extrabold">Keren! Kamu sudah melewati separuh jalan!</h3>
+            <p class="text-xs text-emerald-50 mt-0.5">Sekarang kita masuk ke bagian terakhir: kebiasaanmu merapikan & mengamankan dokumen kuliah (Variabel Y).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage Header Card -->
+      <div id="stage-header-card" class="bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-100 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wide" id="stage-variable-badge">
+              Variabel X • Pemanfaatan Google Workspace
+            </div>
+            <h2 id="stage-title" class="text-xl sm:text-2xl font-extrabold text-slate-900">
+              Level 1: Kemudahan Penggunaan
+            </h2>
+            <p id="stage-subtitle" class="text-xs sm:text-sm text-slate-500">
+              Seberapa ramah fitur @upi.edu saat kamu pakai sehari-hari?
+            </p>
+          </div>
+
+          <!-- Stage Target Badge Preview -->
+          <div class="flex items-center gap-2.5 bg-slate-50 border border-slate-200/80 px-3.5 py-2.5 rounded-2xl self-start sm:self-center flex-shrink-0">
+            <span id="stage-badge-icon" class="text-2xl">🧭</span>
+            <div>
+              <div class="text-[10px] font-bold uppercase text-slate-400">Target Badge</div>
+              <div id="stage-badge-name" class="text-xs font-extrabold text-slate-800">Cloud Explorer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Likert Legend Helper -->
+      <div class="bg-blue-50/70 border border-blue-100 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+        <span class="font-bold text-blue-900">Panduan Skala:</span>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 font-medium">
+          <span><strong>1</strong> = Sangat Tidak Setuju</span>
+          <span><strong>2</strong> = Tidak Setuju</span>
+          <span><strong>3</strong> = Netral</span>
+          <span><strong>4</strong> = Setuju</span>
+          <span><strong>5</strong> = Sangat Setuju</span>
+        </div>
+      </div>
+
+      <!-- Questions Container for Active Stage -->
+      <div id="questions-container" class="space-y-4">
+        <!-- Question cards injected dynamically -->
+      </div>
+
+      <!-- Stage Navigation Buttons -->
+      <div class="flex items-center justify-between gap-3 pt-2 pb-8">
+        <button id="btn-prev-stage" type="button" onclick="prevStage()"
+          class="px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-sm shadow-sm transition active:scale-95 flex items-center gap-2">
+          <span>←</span>
+          <span>Sebelumnya</span>
+        </button>
+
+        <button id="btn-next-stage" type="button" onclick="nextStage()"
+          class="flex-1 sm:flex-initial sm:min-w-[220px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gws-blue to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-blue-500/20 transition active:scale-95 flex items-center justify-center gap-2">
+          <span id="btn-next-label">Lanjut Level Berikutnya</span>
+          <span>→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 3: RESULT, PERSONA CARD & SPREADSHEET SYNC                -->
+    <!-- ================================================================ -->
+    <section id="screen-result" class="hidden animate-pop space-y-6 pb-10">
+
+      <!-- Sync Status Banner (Privacy-safe: No Spreadsheet ID exposed to respondent) -->
+      <div id="sync-status-card" class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div id="sync-spinner" class="w-9 h-9 rounded-xl bg-blue-50 text-gws-blue flex items-center justify-center text-lg">
+            ⏳
+          </div>
+          <div>
+            <h3 id="sync-title" class="text-sm font-extrabold text-slate-900">Menyimpan Jawaban Penelitian...</h3>
+            <p id="sync-desc" class="text-xs text-slate-500">Mengamankan data respons ke sistem penelitian FPEB UPI.</p>
+          </div>
+        </div>
+        <button id="btn-retry-sync" type="button" onclick="syncToGoogleSheets()" class="hidden px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-gws-blue text-xs font-bold transition">
+          Kirim Ulang
+        </button>
+      </div>
+
+      <!-- Shareable Persona Card -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 overflow-hidden">
+        <!-- Top Gradient Header -->
+        <div class="bg-gradient-to-br from-slate-900 via-upi-maroon to-indigo-950 text-white p-6 sm:p-8 relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 relative z-10">
+            <!-- Chosen Avatar + Celebratory Koko Crown Badge -->
+            <div class="relative flex-shrink-0">
+              <div id="result-avatar-box" class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/15 backdrop-blur-md border-2 border-amber-300/60 flex items-center justify-center text-4xl sm:text-5xl shadow-lg animate-float">
+                🚀
+              </div>
+              <div id="result-koko-crown-slot" class="w-12 h-12 -bottom-2 -right-2 absolute drop-shadow-md"></div>
+            </div>
+
+            <div class="text-center sm:text-left flex-1">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-extrabold mb-2">
+                <span>✨</span>
+                <span>KARTU PERSONA DIGITAL FPEB UPI</span>
+              </div>
+              <h2 id="result-persona-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                Grandmaster Cloud FPEB
+              </h2>
+              <p id="result-respondent-meta" class="text-xs sm:text-sm text-slate-200 mt-1 font-medium">
+                Raka • Manajemen • Angkatan 2023
+              </p>
+              <p id="result-persona-desc" class="text-xs sm:text-sm text-amber-100/90 mt-3 leading-relaxed">
+                Kamu sangat optimal memanfaatkan ekosistem @upi.edu dan memiliki sistem pengarsipan dokumen kuliah yang super terstruktur!
+              </p>
+            </div>
+          </div>
+
+          <!-- Total XP & Scores Summary Strip -->
+          <div class="grid grid-cols-3 gap-2.5 mt-6 pt-5 border-t border-white/15 text-center">
+            <div class="bg-white/10 rounded-2xl p-3">
+              <div class="text-[11px] text-slate-300 font-semibold">Total XP</div>
+              <div id="result-xp" class="text-lg sm:text-xl font-extrabold text-amber-300">1500 XP</div>
+            </div>
+            <div class="bg-white/10 rounded-2xl p-3">
+              <div class="text-[11px] text-slate-300 font-semibold">Skor Workspace (X)</div>
+              <div id="result-score-x" class="text-lg sm:text-xl font-extrabold text-sky-300">36 / 40</div>
+            </div>
+            <div class="bg-white/10 rounded-2xl p-3">
+              <div class="text-[11px] text-slate-300 font-semibold">Skor Dokumen (Y)</div>
+              <div id="result-score-y" class="text-lg sm:text-xl font-extrabold text-emerald-300">32 / 35</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicator Breakdown & Unlocked Badges -->
+        <div class="p-6 sm:p-8 space-y-6">
+          <!-- Indicator Bars -->
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-3.5 flex items-center gap-2">
+              <span>📊</span>
+              <span>Rincian Skor per Indikator Penelitian</span>
+            </h3>
+            <div id="indicator-bars-container" class="space-y-3">
+              <!-- Bars injected by JS -->
+            </div>
+          </div>
+
+          <hr class="border-slate-100" />
+
+          <!-- Unlocked 6 Badges -->
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span>🏅</span>
+              <span>6 Badge Misi Berhasil Dikumpulkan</span>
+            </h3>
+            <div id="unlocked-badges-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <!-- Badges injected by JS -->
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
+            <button type="button" onclick="copyShareMessage()"
+              class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-gws-green to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition active:scale-95">
+              <span>📋</span>
+              <span>Salin Hasil & Ajak Teman FPEB</span>
+            </button>
+            <button type="button" onclick="resetForNewRespondent()"
+              class="py-3.5 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center gap-2 transition active:scale-95">
+              <span>🔄</span>
+              <span>Responden Baru</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="max-w-3xl mx-auto px-4 pb-8 text-center text-xs text-slate-400 space-y-1.5">
+    <p>Instrumen Penelitian Akademik • Mahasiswa Fakultas Pendidikan Ekonomi dan Bisnis (FPEB) UPI</p>
+    <p>
+      <span id="secret-version-trigger" onclick="handleSecretVersionTap()" class="select-none cursor-default text-[11px] text-slate-400/80 hover:text-slate-500 transition">
+        v2.1 • FPEB UPI
+      </span>
+    </p>
+  </footer>
+
+  <!-- ==================== SECRET RESEARCHER PIN LOGIN MODAL ==================== -->
+  <div id="pin-modal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-200 p-6 space-y-4 animate-pop">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-red-50 text-upi-maroon flex items-center justify-center text-lg">🔐</div>
+          <div>
+            <h2 class="text-base font-extrabold text-slate-900">Akses Khusus Peneliti</h2>
+            <p class="text-[11px] text-slate-500">Masukkan PIN untuk membuka konfigurasi</p>
+          </div>
+        </div>
+        <button type="button" onclick="closePinModal()" class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold">
+          ✕
+        </button>
+      </div>
+
+      <form onsubmit="verifyResearcherPin(event)" class="space-y-3">
+        <div>
+          <label for="input-researcher-pin" class="block text-xs font-bold text-slate-700 mb-1">PIN Peneliti</label>
+          <input id="input-researcher-pin" type="password" inputmode="numeric" maxlength="12" placeholder="••••" autocomplete="off"
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-upi-maroon focus:ring-4 focus:ring-red-500/10 outline-none text-center text-lg font-extrabold tracking-widest" />
+          <p id="pin-error-msg" class="hidden text-[11px] font-bold text-rose-600 mt-1.5">PIN salah. Akses ditolak.</p>
+        </div>
+        <button type="submit"
+          class="w-full py-3 rounded-xl bg-upi-maroon hover:bg-upi-dark text-white font-extrabold text-xs sm:text-sm transition active:scale-95">
+          Buka Panel Peneliti
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== RESEARCHER / SPREADSHEET MODAL (PIN PROTECTED) ==================== -->
+  <div id="researcher-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 sm:p-7 space-y-5 animate-pop">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-upi-maroon mb-1">🔓 Mode Peneliti Terverifikasi</span>
+          <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">Integrasi Google Spreadsheet</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Panel ini tersembunyi dari responden dan hanya dapat diakses menggunakan PIN Peneliti.</p>
+        </div>
+        <button type="button" onclick="closeResearcherModal()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm">
+          ✕
+        </button>
+      </div>
+
+      <!-- Target Spreadsheet Info (Only visible after PIN unlock) -->
+      <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 space-y-2">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <span class="text-xs font-extrabold text-emerald-900">Spreadsheet Tujuan Terkonfigurasi:</span>
+          <a href="https://docs.google.com/spreadsheets/d/1RFpRijCf3kpctrcrqLMn8UT4qSKr1w3YNBQkVcdY7WM/edit" target="_blank" rel="noopener noreferrer"
+            class="text-xs font-bold text-emerald-700 underline hover:text-emerald-900">
+            Buka Spreadsheet ↗
+          </a>
+        </div>
+        <div class="font-mono text-xs bg-white px-3 py-2 rounded-xl border border-emerald-200 text-slate-700 break-all">
+          1RFpRijCf3kpctrcrqLMn8UT4qSKr1w3YNBQkVcdY7WM
+        </div>
+      </div>
+
+      <!-- Apps Script URL Config -->
+      <div class="space-y-2">
+        <label for="input-script-url" class="block text-xs font-extrabold text-slate-800">
+          URL Web App Google Apps Script (Untuk Kirim Otomatis):
+        </label>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="input-script-url" type="url" placeholder="https://script.google.com/macros/s/AKfycbzPX4-R6E6Ag1CvptcxdMMWSqRrCK9VnCC9U8Rej3_TYNQPxZG3gzOW3bGxk8UQL7Y5ig/exec"
+            class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:border-gws-blue outline-none" />
+          <button type="button" onclick="saveAppsScriptUrl()"
+            class="px-4 py-2.5 rounded-xl bg-gws-blue hover:bg-blue-600 text-white text-xs font-bold transition whitespace-nowrap">
+            Simpan URL
+          </button>
+          <button type="button" onclick="testAppsScriptConnection()"
+            class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition whitespace-nowrap">
+            Tes Koneksi
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500">
+          Penting: Agar semua responden otomatis mengirim ke Google Sheet tanpa perlu mengatur apa pun, tempelkan URL Web App Anda langsung ke konstanta <code class="bg-slate-100 px-1 rounded">APPS_SCRIPT_WEB_APP_URL</code> di baris pertama bagian <code class="bg-slate-100 px-1 rounded">&lt;script&gt;</code> file HTML ini sebelum dipublikasikan.
+        </p>
+      </div>
+
+      <!-- Ready-to-copy Apps Script Code -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-slate-800">Kode Google Apps Script (Siap Pakai):</span>
+          <button type="button" onclick="copyAppsScriptCode()"
+            class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold transition">
+            Salin Kode Script
+          </button>
+        </div>
+        <pre id="apps-script-code" class="bg-slate-900 text-slate-100 p-3.5 rounded-2xl text-[11px] font-mono overflow-x-auto leading-relaxed">function doPost(e) {
+  var ss = SpreadsheetApp.openById("1RFpRijCf3kpctrcrqLMn8UT4qSKr1w3YNBQkVcdY7WM");
+  var sheet = ss.getSheets()[0];
+  var data = JSON.parse(e.postData.contents);
+
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "Timestamp", "Nama_Inisial", "NIM", "Prodi", "Angkatan", "Perangkat",
+      "X1_1", "X1_2", "X1_3", "X2_1", "X2_2", "X2_3", "X3_1", "X3_2",
+      "Y1_1", "Y1_2", "Y1_3", "Y2_1", "Y2_2", "Y3_1", "Y3_2",
+      "Total_X", "Total_Y", "Persona"
+    ]);
+  }
+
+  sheet.appendRow([
+    data.timestamp, data.nama, data.nim, data.prodi, data.angkatan, data.perangkat,
+    data.item_1, data.item_2, data.item_3, data.item_4, data.item_5, data.item_6, data.item_7, data.item_8,
+    data.item_9, data.item_10, data.item_11, data.item_12, data.item_13, data.item_14, data.item_15,
+    data.total_x, data.total_y, data.persona
+  ]);
+
+  return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+      </div>
+
+      <!-- Session Collected Responses & CSV Export -->
+      <div class="border-t border-slate-100 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-xs text-slate-600">
+          Data terkumpul di sesi ini: <strong id="session-count-badge" class="text-slate-900">0 Responden</strong>
+        </div>
+        <button type="button" onclick="downloadSessionCSV()"
+          class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-1.5">
+          <span>📥</span>
+          <span>Unduh CSV (Siap Excel / SPSS)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // =========================================================================
+    // 1. KONFIGURASI SPREADSHEET & KEAMANAN PENELITI
+    // =========================================================================
+    // Tempelkan URL Web App Google Apps Script Anda di sini sebelum web disebarkan:
+    let APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPX4-R6E6Ag1CvptcxdMMWSqRrCK9VnCC9U8Rej3_TYNQPxZG3gzOW3bGxk8UQL7Y5ig/exec";
+
+    const TARGET_SPREADSHEET_ID = "1RFpRijCf3kpctrcrqLMn8UT4qSKr1w3YNBQkVcdY7WM";
+    const RESEARCHER_PIN = "2026";
+    let isResearcherUnlocked = false;
+    let secretTapCount = 0;
+    let secretTapTimer = null;
+
+    // =========================================================================
+    // 1B. KARAKTER PEMANDU LUCU: "KOKO" (CLOUD OWL MASCOT FPEB UPI)
+    // =========================================================================
+    function getKokoSVG(mood = "happy") {
+      // Ekspresi mata & mulut dinamis berdasarkan reaksi jawaban responden
+      let eyesMarkup = `
+        <circle cx="43" cy="54" r="6.5" fill="#1E293B"/>
+        <circle cx="45" cy="52" r="2.2" fill="#FFFFFF"/>
+        <circle cx="77" cy="54" r="6.5" fill="#1E293B"/>
+        <circle cx="79" cy="52" r="2.2" fill="#FFFFFF"/>
+      `;
+      let beakMarkup = `<path d="M55 61 L65 61 L60 68 Z" fill="#F59E0B"/>`;
+      let extraAccessory = "";
+
+      if (mood === "excited" || mood === "celebrate") {
+        // Mata berbinar bahagia (^ ^)
+        eyesMarkup = `
+          <path d="M36 55 Q43 46 50 55" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M70 55 Q77 46 84 55" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <circle cx="31" cy="61" r="4" fill="#FDA4AF" opacity="0.75"/>
+          <circle cx="89" cy="61" r="4" fill="#FDA4AF" opacity="0.75"/>
+        `;
+        beakMarkup = `<path d="M54 60 Q60 70 66 60 Z" fill="#F59E0B"/>`;
+      } else if (mood === "empathetic") {
+        // Mata kaget/empati (O O) saat responden memilih STS/TS
+        eyesMarkup = `
+          <circle cx="43" cy="54" r="7.5" fill="#1E293B"/>
+          <circle cx="41" cy="52" r="2.5" fill="#FFFFFF"/>
+          <circle cx="77" cy="54" r="7.5" fill="#1E293B"/>
+          <circle cx="75" cy="52" r="2.5" fill="#FFFFFF"/>
+          <path d="M35 45 L48 48" stroke="#991B1B" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M85 45 L72 48" stroke="#991B1B" stroke-width="2.5" stroke-linecap="round"/>
+        `;
+        beakMarkup = `<ellipse cx="60" cy="64" rx="4.5" ry="3.5" fill="#F59E0B"/>`;
+      } else if (mood === "curious") {
+        // Mata melirik penasaran saat memilih Netral
+        eyesMarkup = `
+          <circle cx="45" cy="54" r="6" fill="#1E293B"/>
+          <circle cx="47" cy="52" r="2" fill="#FFFFFF"/>
+          <circle cx="79" cy="54" r="6" fill="#1E293B"/>
+          <circle cx="81" cy="52" r="2" fill="#FFFFFF"/>
+        `;
+        beakMarkup = `<path d="M56 62 L64 62 L60 66 Z" fill="#F59E0B"/>`;
+      }
+
+      if (mood === "celebrate") {
+        // Mahkota emas kemenangan di atas topi toga
+        extraAccessory = `
+          <path d="M46 16 L51 7 L60 14 L69 7 L74 16 Z" fill="#FBBF24" stroke="#D97706" stroke-width="1.5" stroke-linejoin="round"/>
+        `;
+      }
+
+      return `
+        <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
+          <!-- Sayap Kiri & Kanan (Warna Maroon FPEB UPI) -->
+          <ellipse cx="24" cy="76" rx="11" ry="18" transform="rotate(18 24 76)" fill="#991B1B"/>
+          <ellipse cx="96" cy="76" rx="11" ry="18" transform="rotate(-18 96 76)" fill="#991B1B"/>
+
+          <!-- Badan Chubby Cloud Owl -->
+          <rect x="27" y="30" width="66" height="72" rx="33" fill="#EFF6FF" stroke="#2563EB" stroke-width="3"/>
+          <!-- Perut Bulu Lembut -->
+          <path d="M40 76 Q60 66 80 76 Q80 96 60 96 Q40 96 40 76 Z" fill="#DBEAFE"/>
+
+          <!-- Lingkaran Mata Besar -->
+          <circle cx="43" cy="54" r="14" fill="#FFFFFF" stroke="#93C5FD" stroke-width="2.5"/>
+          <circle cx="77" cy="54" r="14" fill="#FFFFFF" stroke="#93C5FD" stroke-width="2.5"/>
+          <!-- Kacamata Pintar Mahasiswa -->
+          <line x1="57" y1="54" x2="63" y2="54" stroke="#1E293B" stroke-width="3"/>
+
+          ${eyesMarkup}
+          ${beakMarkup}
+
+          <!-- Topi Toga Akademik UPI -->
+          <polygon points="60,14 92,26 60,36 28,26" fill="#1E293B"/>
+          <rect x="44" y="29" width="32" height="7" rx="3" fill="#334155"/>
+          <path d="M86 27 L91 41" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="91" cy="42" r="2.8" fill="#F59E0B"/>
+          ${extraAccessory}
+
+          <!-- Tablet Cloud Mini yang Dipegang Koko -->
+          <rect x="44" y="75" width="32" height="22" rx="5" fill="#2563EB" stroke="#1D4ED8" stroke-width="2"/>
+          <circle cx="60" cy="86" r="4" fill="#93C5FD"/>
+
+          <!-- Kaki Kecil -->
+          <ellipse cx="47" cy="103" rx="7" ry="4" fill="#F59E0B"/>
+          <ellipse cx="73" cy="103" rx="7" ry="4" fill="#F59E0B"/>
+        </svg>
+      `;
+    }
+
+    function updateKokoCompanion(mood, speechText, moodLabel, animateClass = "animate-koko-bounce") {
+      const avatarSlot = document.getElementById("quest-koko-avatar");
+      const speechEl = document.getElementById("koko-speech-text");
+      const moodBadge = document.getElementById("koko-mood-badge");
+      if (!avatarSlot || !speechEl) return;
+
+      avatarSlot.innerHTML = getKokoSVG(mood);
+      if (moodBadge && moodLabel) moodBadge.textContent = moodLabel;
+      speechEl.textContent = `"${speechText}"`;
+
+      avatarSlot.classList.remove("animate-koko-bounce", "animate-koko-wiggle");
+      void avatarSlot.offsetWidth; // trigger reflow untuk mengulang animasi
+      avatarSlot.classList.add(animateClass);
+    }
+
+    // =========================================================================
+    // 2. DATA OPERASIONAL VARIABEL (SESUAI PDF OPERASIONAL VARIABEL_REVISI)
+    // =========================================================================
+    const STAGES = [
+      {
+        id: 1,
+        variable: "Variabel X",
+        variableFull: "Pemanfaatan Google Workspace for Education (X)",
+        indicator: "Kemudahan Penggunaan",
+        shortLabel: "Kemudahan",
+        subtitle: "Seberapa intuitif & fleksibel ekosistem @upi.edu saat kamu gunakan?",
+        badgeIcon: "🧭",
+        badgeName: "Cloud Explorer",
+        colorClass: "bg-blue-50 text-gws-blue border border-blue-200",
+        barColor: "bg-gws-blue",
+        items: [
+          {
+            no: 1,
+            code: "X1_1",
+            measure: "Tingkat Kemudahan Pemahaman Fitur",
+            text: "Fitur-fitur Google Workspace for Education (@upi.edu) sangat mudah dipelajari dan dipahami."
+          },
+          {
+            no: 2,
+            code: "X1_2",
+            measure: "Tingkat Kelancaran Pengoperasian Aplikasi",
+            text: "Saya dapat mengoperasikan Google Drive dan aplikasi berbasis cloud tanpa kendala teknis yang berarti."
+          },
+          {
+            no: 3,
+            code: "X1_3",
+            measure: "Tingkat Fleksibilitas Akses Antar Perangkat",
+            text: "Sistem Google Workspace sangat fleksibel untuk diakses kapan saja dan di mana saja melalui berbagai perangkat."
+          }
+        ]
+      },
+      {
+        id: 2,
+        variable: "Variabel X",
+        variableFull: "Pemanfaatan Google Workspace for Education (X)",
+        indicator: "Kebermanfaatan",
+        shortLabel: "Manfaat",
+        subtitle: "Seberapa besar dampaknya pada kecepatan & kolaborasi tugas kuliahmu?",
+        badgeIcon: "⚡",
+        badgeName: "Productivity Booster",
+        colorClass: "bg-amber-50 text-amber-700 border border-amber-200",
+        barColor: "bg-gws-yellow",
+        items: [
+          {
+            no: 4,
+            code: "X2_1",
+            measure: "Tingkat Efisiensi Waktu",
+            text: "Pemanfaatan Google Workspace (@upi.edu) mempercepat penyelesaian tugas-tugas akademik saya."
+          },
+          {
+            no: 5,
+            code: "X2_2",
+            measure: "Tingkat Kemudahan Pengerjaan Tugas",
+            text: "Fitur kolaborasi langsung (real-time editing) mempermudah pengerjaan tugas kelompok secara efisien."
+          },
+          {
+            no: 6,
+            code: "X2_3",
+            measure: "Tingkat Efektivitas Aktivitas",
+            text: "Penggunaan ekosistem Google Workspace meningkatkan efektivitas pengelolaan kegiatan akademik saya secara keseluruhan."
+          }
+        ]
+      },
+      {
+        id: 3,
+        variable: "Variabel X",
+        variableFull: "Pemanfaatan Google Workspace for Education (X)",
+        indicator: "Intensitas Penggunaan",
+        shortLabel: "Intensitas",
+        subtitle: "Seberapa rutin & beragam fitur Workspace yang kamu manfaatkan?",
+        badgeIcon: "🔥",
+        badgeName: "Workspace Power User",
+        colorClass: "bg-rose-50 text-gws-red border border-rose-200",
+        barColor: "bg-gws-red",
+        items: [
+          {
+            no: 7,
+            code: "X3_1",
+            measure: "Tingkat Frekuensi Penggunaan",
+            text: "Saya rutin menggunakan akun Google Workspace (@upi.edu) setiap minggu untuk keperluan perkuliahan."
+          },
+          {
+            no: 8,
+            code: "X3_2",
+            measure: "Tingkat Keragaman Fitur yang Digunakan",
+            text: "Saya secara aktif memanfaatkan berbagai fitur ekosistem Google Workspace (Drive, Docs, Sheets, Slides, Forms)."
+          }
+        ]
+      },
+      {
+        id: 4,
+        variable: "Variabel Y",
+        variableFull: "Pengelolaan Dokumen Akademik Digital (Y)",
+        indicator: "Aksesibilitas Dokumen",
+        shortLabel: "Aksesibilitas",
+        subtitle: "Seberapa rapi folder dan cepat pencarian file kuliahmu?",
+        badgeIcon: "🗂️",
+        badgeName: "Folder Architect",
+        colorClass: "bg-emerald-50 text-gws-green border border-emerald-200",
+        barColor: "bg-gws-green",
+        items: [
+          {
+            no: 9,
+            code: "Y1_1",
+            measure: "Tingkat Kerapian Direktori Dokumen",
+            text: "Saya mengelompokkan dokumen akademik ke dalam direktori folder yang rapi dan terstruktur."
+          },
+          {
+            no: 10,
+            code: "Y1_2",
+            measure: "Tingkat Konsistensi Penamaan Berkas",
+            text: "Saya menerapkan standar penamaan berkas (file naming convention) yang konsisten untuk setiap dokumen akademik."
+          },
+          {
+            no: 11,
+            code: "Y1_3",
+            measure: "Tingkat Kemudahan & Kecepatan Pencarian Dokumen",
+            text: "Saya dapat menemukan kembali dokumen akademik lama dengan cepat menggunakan fitur pencarian."
+          }
+        ]
+      },
+      {
+        id: 5,
+        variable: "Variabel Y",
+        variableFull: "Pengelolaan Dokumen Akademik Digital (Y)",
+        indicator: "Kendali Versi",
+        shortLabel: "Kendali Versi",
+        subtitle: "Bebas dari drama file 'Revisi_Final_FIX_v99.docx'!",
+        badgeIcon: "🧬",
+        badgeName: "Version Master",
+        colorClass: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+        barColor: "bg-indigo-600",
+        items: [
+          {
+            no: 12,
+            code: "Y2_1",
+            measure: "Tingkat Efisiensi Pembatasan Salinan Berkas",
+            text: "Pemanfaatan fitur live editing mencegah terjadinya penumpukan file revisi yang membingungkan."
+          },
+          {
+            no: 13,
+            code: "Y2_2",
+            measure: "Tingkat Keterpusatan Berkas Bersama",
+            text: "Proses revisi dokumen akademik bersama dosen atau rekan kelompok terpusat secara rapi pada satu berkas utama."
+          }
+        ]
+      },
+      {
+        id: 6,
+        variable: "Variabel Y",
+        variableFull: "Pengelolaan Dokumen Akademik Digital (Y)",
+        indicator: "Keamanan",
+        shortLabel: "Keamanan",
+        subtitle: "Perlindungan dokumen kuliah dari risiko laptop rusak atau hilang!",
+        badgeIcon: "🛡️",
+        badgeName: "Digital Guardian",
+        colorClass: "bg-red-50 text-upi-maroon border border-red-200",
+        barColor: "bg-upi-maroon",
+        items: [
+          {
+            no: 14,
+            code: "Y3_1",
+            measure: "Tingkat Persepsi Keamanan Media Cloud",
+            text: "Dokumen akademik saya tersimpan secara aman di cloud sehingga terhindar dari risiko kerusakan perangkat fisik."
+          },
+          {
+            no: 15,
+            code: "Y3_2",
+            measure: "Tingkat Rutinitas Sinkronisasi Berkas ke Cloud",
+            text: "Saya secara rutin menyinkronkan dokumen akademik dari penyimpanan lokal ke Google Drive institusi (@upi.edu)."
+          }
+        ]
+      }
+    ];
+
+    const AVATARS = [
+      { id: "explorer", emoji: "🚀", name: "Drive Explorer", tag: "Serba Cepat" },
+      { id: "architect", emoji: "🗂️", name: "Docs Architect", tag: "Super Rapi" },
+      { id: "strategist", emoji: "📊", name: "Sheets Strategist", tag: "Analitis" },
+      { id: "ninja", emoji: "🥷", name: "Collab Ninja", tag: "Jago Tim" }
+    ];
+
+    const LIKERT_OPTIONS = [
+      { val: 1, short: "STS", label: "Sangat Tidak Setuju", emoji: "😫", activeBg: "bg-rose-600 border-rose-600 text-white" },
+      { val: 2, short: "TS", label: "Tidak Setuju", emoji: "😕", activeBg: "bg-orange-500 border-orange-500 text-white" },
+      { val: 3, short: "N", label: "Netral", emoji: "😐", activeBg: "bg-amber-500 border-amber-500 text-white" },
+      { val: 4, short: "S", label: "Setuju", emoji: "🙂", activeBg: "bg-sky-600 border-sky-600 text-white" },
+      { val: 5, short: "SS", label: "Sangat Setuju", emoji: "🤩", activeBg: "bg-emerald-600 border-emerald-600 text-white" }
+    ];
+
+    // =========================================================================
+    // 3. STATE APLIKASI (IN-MEMORY STATE)
+    // =========================================================================
+    let state = {
+      soundEnabled: true,
+      selectedAvatar: AVATARS[0],
+      respondent: {
+        nama: "",
+        nim: "",
+        prodi: "",
+        angkatan: "",
+        perangkat: ""
+      },
+      currentStageIndex: 0,
+      answers: {}, // { 1: 5, 2: 4, ... }
+      xp: 0,
+      streak: 1,
+      sessionSubmissions: [],
+      lastPayload: null
+    };
+
+    // =========================================================================
+    // 4. AUDIO SYNTHESIZER (TONE.JS)
+    // =========================================================================
+    let synth = null;
+
+    function playTone(type) {
+      if (!state.soundEnabled || typeof Tone === "undefined") return;
+      try {
+        if (Tone.context.state !== "running") {
+          Tone.start();
+        }
+        if (!synth) {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.01, decay: 0.15, sustain: 0.05, release: 0.3 }
+          }).toDestination();
+          synth.volume.value = -10;
+        }
+        const now = Tone.now();
+        if (type === "select") {
+          synth.triggerAttackRelease("C5", "16n", now);
+        } else if (type === "levelup") {
+          synth.triggerAttackRelease("E5", "16n", now);
+          synth.triggerAttackRelease("G5", "16n", now + 0.08);
+          synth.triggerAttackRelease("C6", "8n", now + 0.16);
+        } else if (type === "victory") {
+          synth.triggerAttackRelease(["C5", "E5", "G5"], "8n", now);
+          synth.triggerAttackRelease(["F5", "A5", "C6"], "4n", now + 0.18);
+        }
+      } catch (e) {
+        // Abaikan jika browser memblokir audio sebelum interaksi
+      }
+    }
+
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      document.getElementById("sound-icon").textContent = state.soundEnabled ? "🔊" : "🔇";
+      showToast(state.soundEnabled ? "Efek suara aktif 🔊" : "Efek suara dimatikan 🔇", "info");
+    }
+
+    // =========================================================================
+    // 5. INISIALISASI UI ONBOARDING
+    // =========================================================================
+    function initOnboarding() {
+      // Render Koko di halaman selamat datang & kartu hasil
+      const welcomeKoko = document.getElementById("welcome-koko-slot");
+      if (welcomeKoko) welcomeKoko.innerHTML = getKokoSVG("excited");
+      const crownKoko = document.getElementById("result-koko-crown-slot");
+      if (crownKoko) crownKoko.innerHTML = getKokoSVG("celebrate");
+
+      const avatarGrid = document.getElementById("avatar-grid");
+      avatarGrid.innerHTML = AVATARS.map(av => {
+        const isSelected = state.selectedAvatar.id === av.id;
+        return `
+          <button type="button" onclick="selectAvatar('${av.id}')"
+            class="p-3 rounded-2xl border-2 text-center transition transform active:scale-95 ${
+              isSelected
+                ? "border-gws-blue bg-blue-50/80 shadow-md shadow-blue-500/10"
+                : "border-slate-200 bg-slate-50 hover:border-blue-300"
+            }">
+            <div class="text-3xl mb-1">${av.emoji}</div>
+            <div class="text-xs font-extrabold text-slate-900">${av.name}</div>
+            <div class="text-[10px] font-semibold text-slate-500 mt-0.5">${av.tag}</div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function selectAvatar(id) {
+      const found = AVATARS.find(a => a.id === id);
+      if (found) {
+        state.selectedAvatar = found;
+        playTone("select");
+        initOnboarding();
+      }
+    }
+
+    function selectDevice(deviceName) {
+      state.respondent.perangkat = deviceName;
+      playTone("select");
+      document.querySelectorAll(".device-btn").forEach(btn => {
+        if (btn.dataset.device === deviceName) {
+          btn.classList.remove("border-slate-200", "bg-slate-50", "text-slate-700");
+          btn.classList.add("border-gws-blue", "bg-blue-50", "text-blue-900", "shadow-sm");
+        } else {
+          btn.classList.add("border-slate-200", "bg-slate-50", "text-slate-700");
+          btn.classList.remove("border-gws-blue", "bg-blue-50", "text-blue-900", "shadow-sm");
+        }
+      });
+    }
+
+    function startQuest() {
+      const nama = document.getElementById("input-nama").value.trim();
+      const nim = document.getElementById("input-nim").value.trim();
+      const prodi = document.getElementById("input-prodi").value;
+      const angkatan = document.getElementById("input-angkatan").value;
+
+      if (!nama) {
+        showToast("Isi nama panggilan atau inisialmu dulu ya!", "error");
+        document.getElementById("input-nama").focus();
+        return;
+      }
+      if (!prodi) {
+        showToast("Pilih Program Studi FPEB UPI kamu dulu ya!", "error");
+        document.getElementById("input-prodi").focus();
+        return;
+      }
+      if (!angkatan) {
+        showToast("Pilih tahun angkatan kuliahmu ya!", "error");
+        document.getElementById("input-angkatan").focus();
+        return;
+      }
+      if (!state.respondent.perangkat) {
+        showToast("Pilih perangkat utama yang sering kamu pakai!", "error");
+        return;
+      }
+
+      state.respondent = {
+        nama,
+        nim: nim || "-",
+        prodi,
+        angkatan,
+        perangkat: state.respondent.perangkat
+      };
+
+      playTone("levelup");
+      document.getElementById("screen-welcome").classList.add("hidden");
+      document.getElementById("screen-quest").classList.remove("hidden");
+      state.currentStageIndex = 0;
+      updateKokoCompanion(
+        "happy",
+        `Semangat ${nama}! Kita mulai dari Level 1 ya. Pilih jawaban yang paling jujur sesuai pengalamanmu!`,
+        "Level 1 Dimulai 🚀"
+      );
+      renderStage();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // =========================================================================
+    // 6. RENDER QUEST STAGE & PERTANYAAN
+    // =========================================================================
+    function renderStage() {
+      const stage = STAGES[state.currentStageIndex];
+
+      // Update Stepper
+      const stepper = document.getElementById("stage-stepper");
+      stepper.innerHTML = STAGES.map((st, idx) => {
+        const isCurrent = idx === state.currentStageIndex;
+        const isCompleted = st.items.every(item => state.answers[item.no] !== undefined);
+        let pillStyle = "bg-slate-100 text-slate-400 border-transparent";
+        if (isCurrent) {
+          pillStyle = "bg-blue-600 text-white border-blue-600 shadow-sm scale-[1.03]";
+        } else if (isCompleted) {
+          pillStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
+        }
+        return `
+          <button type="button" onclick="jumpToStage(${idx})"
+            class="py-2 px-1 rounded-xl border text-center transition flex flex-col items-center justify-center ${pillStyle}">
+            <span class="text-xs sm:text-sm">${isCompleted && !isCurrent ? "✅" : st.badgeIcon}</span>
+            <span class="text-[9px] sm:text-[10px] font-extrabold truncate w-full mt-0.5">${st.shortLabel}</span>
+          </button>
+        `;
+      }).join("");
+
+      // Checkpoint Banner khusus Stage 4 (idx 3)
+      const checkpointBanner = document.getElementById("checkpoint-banner");
+      if (state.currentStageIndex === 3) {
+        checkpointBanner.classList.remove("hidden");
+      } else {
+        checkpointBanner.classList.add("hidden");
+      }
+
+      // Update Stage Header Card
+      const varBadge = document.getElementById("stage-variable-badge");
+      varBadge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wide ${stage.colorClass}`;
+      varBadge.textContent = `${stage.variable} • ${stage.variableFull}`;
+
+      document.getElementById("stage-title").textContent = `Level ${stage.id}: ${stage.indicator}`;
+      document.getElementById("stage-subtitle").textContent = stage.subtitle;
+      document.getElementById("stage-badge-icon").textContent = stage.badgeIcon;
+      document.getElementById("stage-badge-name").textContent = stage.badgeName;
+
+      // Render Questions
+      const container = document.getElementById("questions-container");
+      container.innerHTML = stage.items.map((item, idx) => {
+        const currentVal = state.answers[item.no];
+        const isAnswered = currentVal !== undefined;
+
+        return `
+          <div id="q-card-${item.no}" class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border-2 transition-all duration-300 animate-pop ${
+            isAnswered ? "border-emerald-400/70 bg-emerald-50/10" : "border-slate-100"
+          }" style="animation-delay: ${idx * 60}ms;">
+            <div class="flex items-center justify-between gap-2 mb-2.5">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-600">
+                <span>Misi #${item.no} dari 15</span>
+                <span class="text-slate-300">•</span>
+                <span class="text-slate-500 font-semibold">${item.measure}</span>
+              </span>
+              ${isAnswered ? `<span class="text-xs font-extrabold text-emerald-600 flex items-center gap-1">✓ Terjawab</span>` : `<span class="text-[11px] font-bold text-amber-600">+100 XP</span>`}
+            </div>
+
+            <p class="text-sm sm:text-base font-bold text-slate-900 leading-relaxed mb-4">
+              "${item.text}"
+            </p>
+
+            <!-- 5 Likert Scale Buttons -->
+            <div class="grid grid-cols-5 gap-1.5 sm:gap-2.5">
+              ${LIKERT_OPTIONS.map(opt => {
+                const active = currentVal === opt.val;
+                return `
+                  <button type="button" onclick="selectAnswer(${item.no}, ${opt.val}, event)"
+                    class="min-h-[68px] sm:min-h-[76px] p-2 rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition transform active:scale-95 ${
+                      active
+                        ? `${opt.activeBg} shadow-md scale-[1.02]`
+                        : "border-slate-200 bg-slate-50/80 hover:bg-white hover:border-blue-300 text-slate-700"
+                    }">
+                    <span class="text-lg sm:text-xl leading-none">${opt.emoji}</span>
+                    <span class="text-xs sm:text-sm font-extrabold leading-none">${opt.val} (${opt.short})</span>
+                    <span class="hidden sm:block text-[9px] font-semibold opacity-90 text-center leading-tight">${opt.label}</span>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Update Navigation Buttons
+      const prevBtn = document.getElementById("btn-prev-stage");
+      prevBtn.style.visibility = state.currentStageIndex === 0 ? "hidden" : "visible";
+
+      const nextLabel = document.getElementById("btn-next-label");
+      if (state.currentStageIndex === STAGES.length - 1) {
+        nextLabel.textContent = "Selesaikan & Klaim Kartu 🎉";
+      } else {
+        nextLabel.textContent = `Lanjut ke Level ${state.currentStageIndex + 2}`;
+      }
+
+      updateProgressHUD();
+    }
+
+    function selectAnswer(itemNo, value, event) {
+      const wasUnanswered = state.answers[itemNo] === undefined;
+      state.answers[itemNo] = value;
+
+      playTone("select");
+
+      if (wasUnanswered) {
+        state.xp += 100;
+        state.streak = Math.min(state.streak + 1, 5);
+        spawnXpPopup(event, "+100 XP ⚡");
+      }
+
+      // Reaksi Koko secara real-time berdasarkan skala yang dipilih responden
+      if (value <= 2) {
+        updateKokoCompanion(
+          "empathetic",
+          "Wah, ternyata sempat ada kendala ya! Masukan jujurmu berharga banget buat riset ini!",
+          "Empati Koko 🦉",
+          "animate-koko-wiggle"
+        );
+      } else if (value === 3) {
+        updateKokoCompanion(
+          "curious",
+          "Netral nih, oke dicatat! Yuk lanjut ke pernyataan berikutnya!",
+          "Koko Menyimak 🤔",
+          "animate-koko-wiggle"
+        );
+      } else if (value === 4) {
+        updateKokoCompanion(
+          "excited",
+          "Mantap! Ekosistem @upi.edu memang ngebantu aktivitas kuliah ya!",
+          "Koko Senang ✨",
+          "animate-koko-bounce"
+        );
+      } else {
+        updateKokoCompanion(
+          "excited",
+          "Keren maksimal! Kamu benar-benar memanfaatkan fitur cloud dengan optimal!",
+          "Super Cloud User 🌟",
+          "animate-koko-bounce"
+        );
+      }
+
+      renderStage();
+
+      // Auto scroll lembut ke pertanyaan berikutnya di level yang sama jika belum terjawab
+      const currentStage = STAGES[state.currentStageIndex];
+      const nextUnanswered = currentStage.items.find(it => state.answers[it.no] === undefined);
+      if (nextUnanswered) {
+        setTimeout(() => {
+          const nextEl = document.getElementById(`q-card-${nextUnanswered.no}`);
+          if (nextEl) {
+            nextEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 180);
+      }
+    }
+
+    function spawnXpPopup(event, text) {
+      const el = document.createElement("div");
+      el.className = "xp-toast px-3 py-1 rounded-full bg-amber-400 text-slate-900 font-extrabold text-xs shadow-lg";
+      el.textContent = text;
+      const x = event?.clientX ? event.clientX - 30 : window.innerWidth / 2;
+      const y = event?.clientY ? event.clientY - 20 : window.innerHeight / 2;
+      el.style.left = `${Math.max(16, Math.min(window.innerWidth - 110, x))}px`;
+      el.style.top = `${Math.max(60, y)}px`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 950);
+    }
+
+    function updateProgressHUD() {
+      const answeredCount = Object.keys(state.answers).length;
+      const percent = Math.round((answeredCount / 15) * 100);
+
+      document.getElementById("hud-xp").textContent = `${state.xp} XP`;
+      document.getElementById("hud-streak").textContent = `x${state.streak}`;
+      document.getElementById("global-progress-bar").style.width = `${percent}%`;
+
+      const progText = document.getElementById("quest-progress-text");
+      const percText = document.getElementById("quest-percent-text");
+      if (progText) progText.textContent = `Progres Misi: ${answeredCount} / 15 Pernyataan`;
+      if (percText) percText.textContent = `${percent}%`;
+    }
+
+    function jumpToStage(targetIdx) {
+      if (targetIdx <= state.currentStageIndex) {
+        state.currentStageIndex = targetIdx;
+        renderStage();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      // Pastikan stage saat ini sudah diisi sebelum lompat maju
+      const currentStage = STAGES[state.currentStageIndex];
+      const missing = currentStage.items.find(it => state.answers[it.no] === undefined);
+      if (missing) {
+        showToast(`Lengkapi Misi #${missing.no} terlebih dahulu ya!`, "error");
+        return;
+      }
+      state.currentStageIndex = targetIdx;
+      renderStage();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function prevStage() {
+      if (state.currentStageIndex > 0) {
+        state.currentStageIndex--;
+        renderStage();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    function nextStage() {
+      const currentStage = STAGES[state.currentStageIndex];
+      const missing = currentStage.items.find(it => state.answers[it.no] === undefined);
+
+      if (missing) {
+        showToast(`Yuk jawab Misi #${missing.no} dulu sebelum lanjut!`, "error");
+        const card = document.getElementById(`q-card-${missing.no}`);
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      if (state.currentStageIndex < STAGES.length - 1) {
+        playTone("levelup");
+        showToast(`Badge "${currentStage.badgeName}" terbuka! ${currentStage.badgeIcon}`, "success");
+        state.currentStageIndex++;
+        const nextSt = STAGES[state.currentStageIndex];
+        updateKokoCompanion(
+          "celebrate",
+          `Yeay! Badge "${currentStage.badgeName}" berhasil kamu buka! Sekarang lanjut ke Level ${nextSt.id}: ${nextSt.indicator}!`,
+          `Level Up! ${currentStage.badgeIcon}`,
+          "animate-koko-bounce"
+        );
+        renderStage();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        completeQuest();
+      }
+    }
+
+    // =========================================================================
+    // 7. PENYELESAIAN MISI, KALKULASI PERSONA & SINKRONISASI SPREADSHEET
+    // =========================================================================
+    function completeQuest() {
+      playTone("victory");
+      launchConfetti();
+
+      // Hitung Skor Total X (Item 1..8, maks 40) dan Total Y (Item 9..15, maks 35)
+      let totalX = 0;
+      for (let i = 1; i <= 8; i++) totalX += (state.answers[i] || 0);
+
+      let totalY = 0;
+      for (let i = 9; i <= 15; i++) totalY += (state.answers[i] || 0);
+
+      const grandTotal = totalX + totalY; // Maks 75
+
+      // Tentukan Persona Digital berdasarkan skor
+      let personaTitle = "Cloud Rising Star FPEB";
+      let personaDesc = "Kamu sudah mulai memanfaatkan ekosistem @upi.edu dalam perkuliahan dan terus berkembang menuju manajemen dokumen digital yang optimal!";
+      if (grandTotal >= 64) {
+        personaTitle = "Grandmaster Cloud FPEB";
+        personaDesc = "Luar biasa! Kamu sangat optimal memberdayakan Google Workspace (@upi.edu) dan memiliki sistem pengelolaan dokumen akademik digital yang super rapi & aman!";
+      } else if (grandTotal >= 52) {
+        personaTitle = "Digital Organizer Pro";
+        personaDesc = "Keren! Kamu memanfaatkan Google Workspace secara efektif untuk kolaborasi kuliah dan menjaga keteraturan file akademikmu dengan baik.";
+      } else if (grandTotal >= 38) {
+        personaTitle = "Smart Cloud Explorer";
+        personaDesc = "Bagus! Kamu sudah terbiasa menggunakan fitur dasar Workspace untuk perkuliahan dan bisa mengoptimalkan penataan folder & sinkronisasi cloud lebih jauh.";
+      }
+
+      // Render Result Screen
+      document.getElementById("screen-quest").classList.add("hidden");
+      document.getElementById("screen-result").classList.remove("hidden");
+
+      document.getElementById("result-avatar-box").textContent = state.selectedAvatar.emoji;
+      document.getElementById("result-persona-title").textContent = personaTitle;
+      document.getElementById("result-respondent-meta").textContent =
+        `${state.respondent.nama} • ${state.respondent.prodi} • Angkatan ${state.respondent.angkatan}`;
+      document.getElementById("result-persona-desc").textContent = personaDesc;
+
+      document.getElementById("result-xp").textContent = `${state.xp} XP`;
+      document.getElementById("result-score-x").textContent = `${totalX} / 40`;
+      document.getElementById("result-score-y").textContent = `${totalY} / 35`;
+
+      // Render Indicator Breakdown Bars
+      const barsContainer = document.getElementById("indicator-bars-container");
+      barsContainer.innerHTML = STAGES.map(st => {
+        const maxStageScore = st.items.length * 5;
+        const stageScore = st.items.reduce((acc, it) => acc + (state.answers[it.no] || 0), 0);
+        const pct = Math.round((stageScore / maxStageScore) * 100);
+        return `
+          <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+            <div class="flex items-center justify-between text-xs font-bold mb-1.5">
+              <span class="text-slate-800">${st.badgeIcon} ${st.indicator} <span class="text-slate-400 font-medium">(${st.variable})</span></span>
+              <span class="text-slate-900">${stageScore}/${maxStageScore} (${pct}%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full ${st.barColor} rounded-full transition-all duration-700" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Render 6 Unlocked Badges
+      const badgesGrid = document.getElementById("unlocked-badges-grid");
+      badgesGrid.innerHTML = STAGES.map(st => `
+        <div class="flex items-center gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+          <span class="text-2xl">${st.badgeIcon}</span>
+          <div>
+            <div class="text-xs font-extrabold text-slate-900">${st.badgeName}</div>
+            <div class="text-[10px] font-medium text-slate-500">${st.indicator}</div>
+          </div>
+        </div>
+      `).join("");
+
+      // Susun Payload Data untuk Spreadsheet ID: 1RFpRijCf3kpctrcrqLMn8UT4qSKr1w3YNBQkVcdY7WM
+      const nowWIB = new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" });
+      const payload = {
+        spreadsheetId: TARGET_SPREADSHEET_ID,
+        timestamp: nowWIB,
+        nama: state.respondent.nama,
+        nim: state.respondent.nim,
+        prodi: state.respondent.prodi,
+        angkatan: state.respondent.angkatan,
+        perangkat: state.respondent.perangkat,
+        item_1: state.answers[1],
+        item_2: state.answers[2],
+        item_3: state.answers[3],
+        item_4: state.answers[4],
+        item_5: state.answers[5],
+        item_6: state.answers[6],
+        item_7: state.answers[7],
+        item_8: state.answers[8],
+        item_9: state.answers[9],
+        item_10: state.answers[10],
+        item_11: state.answers[11],
+        item_12: state.answers[12],
+        item_13: state.answers[13],
+        item_14: state.answers[14],
+        item_15: state.answers[15],
+        total_x: totalX,
+        total_y: totalY,
+        persona: personaTitle
+      };
+
+      state.lastPayload = payload;
+      state.sessionSubmissions.push(payload);
+      document.getElementById("session-count-badge").textContent = `${state.sessionSubmissions.length} Responden`;
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      syncToGoogleSheets();
+    }
+
+    async function syncToGoogleSheets() {
+      if (!state.lastPayload) return;
+
+      const spinner = document.getElementById("sync-spinner");
+      const title = document.getElementById("sync-title");
+      const desc = document.getElementById("sync-desc");
+      const retryBtn = document.getElementById("btn-retry-sync");
+
+      if (!APPS_SCRIPT_WEB_APP_URL) {
+        spinner.className = "w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg";
+        spinner.textContent = "✅";
+        title.textContent = "Terima Kasih! Respons Kamu Sudah Tercatat";
+        desc.textContent = "Jawaban kuesioner kamu telah direkam untuk penelitian FPEB UPI.";
+        retryBtn.classList.add("hidden");
+        return;
+      }
+
+      spinner.className = "w-9 h-9 rounded-xl bg-blue-50 text-gws-blue flex items-center justify-center text-lg animate-spin";
+      spinner.textContent = "⏳";
+      title.textContent = "Menyimpan Jawaban Penelitian...";
+      desc.textContent = "Sedang mengirim data ke server penelitian FPEB UPI...";
+      retryBtn.classList.add("hidden");
+
+      try {
+        await fetch(APPS_SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(state.lastPayload)
+        });
+
+        spinner.className = "w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg";
+        spinner.textContent = "✅";
+        title.textContent = "Terima Kasih! Data Berhasil Tersimpan";
+        desc.textContent = "Respons kamu telah tercatat aman di database penelitian FPEB UPI.";
+        showToast("Terima kasih! Jawaban kamu berhasil tersimpan ✅", "success");
+      } catch (err) {
+        spinner.className = "w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg";
+        spinner.textContent = "⚠️";
+        title.textContent = "Koneksi Terkendala";
+        desc.textContent = "Periksa koneksi internet kamu lalu tekan Kirim Ulang.";
+        retryBtn.classList.remove("hidden");
+      }
+    }
+
+    function resetForNewRespondent() {
+      state.answers = {};
+      state.xp = 0;
+      state.streak = 1;
+      state.currentStageIndex = 0;
+      state.respondent = { nama: "", nim: "", prodi: "", angkatan: "", perangkat: "" };
+
+      document.getElementById("input-nama").value = "";
+      document.getElementById("input-nim").value = "";
+      document.getElementById("input-prodi").value = "";
+      document.getElementById("input-angkatan").value = "";
+      document.querySelectorAll(".device-btn").forEach(btn => {
+        btn.classList.add("border-slate-200", "bg-slate-50", "text-slate-700");
+        btn.classList.remove("border-gws-blue", "bg-blue-50", "text-blue-900", "shadow-sm");
+      });
+
+      updateProgressHUD();
+      document.getElementById("screen-result").classList.add("hidden");
+      document.getElementById("screen-welcome").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // =========================================================================
+    // 8. SECRET RESEARCHER ACCESS (5x TAP / CTRL+SHIFT+A + PIN) & EXPORT CSV
+    // =========================================================================
+    function handleSecretVersionTap() {
+      secretTapCount++;
+      clearTimeout(secretTapTimer);
+      secretTapTimer = setTimeout(() => {
+        secretTapCount = 0;
+      }, 2000);
+
+      if (secretTapCount >= 5) {
+        secretTapCount = 0;
+        requestResearcherAccess();
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "A" || e.key === "a")) {
+        e.preventDefault();
+        requestResearcherAccess();
+      }
+    });
+
+    function requestResearcherAccess() {
+      if (isResearcherUnlocked) {
+        openResearcherModal();
+        return;
+      }
+      document.getElementById("input-researcher-pin").value = "";
+      document.getElementById("pin-error-msg").classList.add("hidden");
+      document.getElementById("pin-modal").classList.remove("hidden");
+      setTimeout(() => document.getElementById("input-researcher-pin").focus(), 100);
+    }
+
+    function closePinModal() {
+      document.getElementById("pin-modal").classList.add("hidden");
+    }
+
+    function verifyResearcherPin(event) {
+      event.preventDefault();
+      const entered = document.getElementById("input-researcher-pin").value.trim();
+      if (entered === RESEARCHER_PIN) {
+        isResearcherUnlocked = true;
+        closePinModal();
+        openResearcherModal();
+        showToast("Akses Peneliti dibuka 🔓", "success");
+      } else {
+        document.getElementById("pin-error-msg").classList.remove("hidden");
+        document.getElementById("input-researcher-pin").value = "";
+        document.getElementById("input-researcher-pin").focus();
+      }
+    }
+
+    function openResearcherModal() {
+      if (!isResearcherUnlocked) {
+        requestResearcherAccess();
+        return;
+      }
+      document.getElementById("input-script-url").value = APPS_SCRIPT_WEB_APP_URL;
+      document.getElementById("session-count-badge").textContent = `${state.sessionSubmissions.length} Responden`;
+      document.getElementById("researcher-modal").classList.remove("hidden");
+    }
+
+    function closeResearcherModal() {
+      document.getElementById("researcher-modal").classList.add("hidden");
+    }
+
+    function saveAppsScriptUrl() {
+      const url = document.getElementById("input-script-url").value.trim();
+      if (url && !url.startsWith("https://script.google.com/")) {
+        showToast("URL harus diawali https://script.google.com/...", "error");
+        return;
+      }
+      APPS_SCRIPT_WEB_APP_URL = url;
+      showToast(url ? "URL Apps Script berhasil terhubung!" : "URL Apps Script dikosongkan.", "success");
+      if (state.lastPayload && url) {
+        syncToGoogleSheets();
+      }
+    }
+
+    async function testAppsScriptConnection() {
+      const url = document.getElementById("input-script-url").value.trim() || APPS_SCRIPT_WEB_APP_URL;
+      if (!url) {
+        showToast("Masukkan URL Web App Apps Script terlebih dahulu.", "error");
+        return;
+      }
+      try {
+        await fetch(url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            timestamp: new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
+            nama: "TES_KONEKSI_PENELITI",
+            nim: "-",
+            prodi: "FPEB UPI",
+            angkatan: "-",
+            perangkat: "-",
+            item_1: 5, item_2: 5, item_3: 5, item_4: 5, item_5: 5, item_6: 5, item_7: 5, item_8: 5,
+            item_9: 5, item_10: 5, item_11: 5, item_12: 5, item_13: 5, item_14: 5, item_15: 5,
+            total_x: 40, total_y: 35, persona: "Tes Koneksi"
+          })
+        });
+        showToast("Baris tes dikirim! Cek Google Spreadsheet Anda ✅", "success");
+      } catch (e) {
+        showToast("Gagal menghubungi URL Apps Script.", "error");
+      }
+    }
+
+    function copyTextFallback(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand("copy");
+      } catch (e) {
+        // Fallback aman
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function copyAppsScriptCode() {
+      const code = document.getElementById("apps-script-code").textContent;
+      copyTextFallback(code);
+      showToast("Kode Google Apps Script disalin! 📋", "success");
+    }
+
+    function copyShareMessage() {
+      const persona = document.getElementById("result-persona-title").textContent;
+      const xp = document.getElementById("result-xp").textContent;
+      const msg = `Halo anak FPEB UPI! 🎓 Aku baru aja nyelesain misi survei *FPEB CloudQuest* (@upi.edu) dan dapet persona *"${persona}"* (${xp})! ⚡\n\nCuma 2 menit dan seru banget, yuk ikutan isi buat bantu riset teman kita! 🚀`;
+      copyTextFallback(msg);
+      showToast("Pesan ajakan disalin! Siap ditempel ke grup WhatsApp FPEB 📋", "success");
+    }
+
+    function downloadSessionCSV() {
+      if (state.sessionSubmissions.length === 0) {
+        showToast("Belum ada data responden yang selesai di sesi ini.", "error");
+        return;
+      }
+      const headers = [
+        "Timestamp", "Nama_Inisial", "NIM", "Prodi", "Angkatan", "Perangkat",
+        "X1_1", "X1_2", "X1_3", "X2_1", "X2_2", "X2_3", "X3_1", "X3_2",
+        "Y1_1", "Y1_2", "Y1_3", "Y2_1", "Y2_2", "Y3_1", "Y3_2",
+        "Total_X", "Total_Y", "Persona"
+      ];
+      const rows = state.sessionSubmissions.map(row => [
+        row.timestamp, row.nama, row.nim, row.prodi, row.angkatan, row.perangkat,
+        row.item_1, row.item_2, row.item_3, row.item_4, row.item_5, row.item_6, row.item_7, row.item_8,
+        row.item_9, row.item_10, row.item_11, row.item_12, row.item_13, row.item_14, row.item_15,
+        row.total_x, row.total_y, row.persona
+      ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Data_Kuesioner_FPEB_UPI_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("File CSV berhasil diunduh! 📥", "success");
+    }
+
+    // =========================================================================
+    // 9. TOAST & CONFETTI HELPER
+    // =========================================================================
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      let bgClass = "bg-slate-900 text-white";
+      if (type === "error") bgClass = "bg-rose-600 text-white";
+      if (type === "success") bgClass = "bg-emerald-600 text-white";
+
+      toast.className = `${bgClass} px-4 py-3 rounded-2xl shadow-lg text-xs font-bold animate-pop pointer-events-auto`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 0.3s ease";
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function launchConfetti() {
+      const colors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853", "#8B1E24"];
+      for (let i = 0; i < 45; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece rounded-sm";
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.backgroundColor = colors[i % colors.length];
+        piece.style.animationDuration = `${2 + Math.random() * 2}s`;
+        piece.style.animationDelay = `${Math.random() * 0.4}s`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 4200);
+      }
+    }
+
+    // Jalankan saat halaman dimuat
+    window.addEventListener("DOMContentLoaded", () => {
+      initOnboarding();
+    });
+  </script>
+</body>
+</html>
